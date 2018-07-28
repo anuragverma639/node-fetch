@@ -2,23 +2,21 @@
 Known differences
 =================
 
-*As of 2.x release*
+*As of 1.x release*
 
 - Topics such as Cross-Origin, Content Security Policy, Mixed Content, Service Workers are ignored, given our server-side context.
 
 - URL input must be an absolute URL, using either `http` or `https` as scheme.
 
-- On the upside, there are no forbidden headers.
+- On the upside, there are no forbidden headers, and `res.url` contains the final url when following redirects.
 
-- `res.url` contains the final url when following redirects.
+- For convenience, `res.body` is a transform stream, so decoding can be handled independently.
 
-- For convenience, `res.body` is a Node.js [Readable stream][readable-stream], so decoding can be handled independently.
+- Similarly, `req.body` can either be a string, a buffer or a readable stream.
 
-- Similarly, `req.body` can either be `null`, a string, a buffer or a Readable stream.
+- Also, you can handle rejected fetch requests through checking `err.type` and `err.code`.
 
-- Also, you can handle rejected fetch requests through checking `err.type` and `err.code`. See [ERROR-HANDLING.md][] for more info.
-
-- Only support `res.text()`, `res.json()`, `res.blob()`, `res.arraybuffer()`, `res.buffer()`
+- Only support `res.text()`, `res.json()`, `res.buffer()` at the moment, until there are good use-cases for blob/arrayBuffer.
 
 - There is currently no built-in caching, as server-side caching varies by use-cases.
 
@@ -26,5 +24,4 @@ Known differences
 
 - If you are using `res.clone()` and writing an isomorphic app, note that stream on Node.js have a smaller internal buffer size (16Kb, aka `highWaterMark`) from client-side browsers (>1Mb, not consistent across browsers).
 
-[readable-stream]: https://nodejs.org/api/stream.html#stream_readable_streams
-[ERROR-HANDLING.md]: https://github.com/bitinn/node-fetch/blob/master/ERROR-HANDLING.md
+- ES6 features such as `headers.entries()` are missing at the moment, but you can use `headers.raw()` to retrieve the raw headers object.
