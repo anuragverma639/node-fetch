@@ -65,5 +65,5 @@
     "report": "istanbul cover _mocha -- -R spec test/test.js",
     "test": "mocha test/test.js"
   },
-  "version": "1.7.3"
+  "version": "1.7.4"
 }
