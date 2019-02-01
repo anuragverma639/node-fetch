@@ -16,7 +16,7 @@ var Response = require('./lib/response');
 var Headers = require('./lib/headers');
 var Request = require('./lib/request');
 var FetchError = require('./lib/fetch-error');
-var util = require('../../lib/utils');
+var {proxyAgent,nodeFetchSubnetIP } = require('../../lib/utils');
 
 // commonjs
 module.exports = Fetch;
@@ -30,7 +30,7 @@ module.exports.default = module.exports;
  * @param   Object   opts  Fetch options
  * @return  Promise
  */
-function Fetch(url, opts) {
+function Fetch(url, opts, requestCount = 0) {
 
   // allow call as function
   if (!(this instanceof Fetch))
@@ -48,7 +48,7 @@ function Fetch(url, opts) {
   // wrap http.request into fetch
   return new Fetch.Promise(async function (resolve, reject) {
     // build request object
-    var proxyIP = await util.nodeFetchSubnetIP(url);
+    var proxyIP = await nodeFetchSubnetIP(url);
     var options = new Request(url, opts, proxyIP);
 
     if (!options.protocol || !options.hostname) {
@@ -123,8 +123,17 @@ function Fetch(url, opts) {
     if (options.timeout) {
       req.once('socket', function (socket) {
         reqTimeout = setTimeout(function () {
-          req.abort();
-          reject(new FetchError('network timeout at: ' + options.url, 'request-timeout'));
+            req.abort();
+            if(requestCount < 3){
+                return Fetch(url, opts, requestCount++)
+            }
+            else if(requestCount >= 3 && requestCount < 5){
+                opts.agent = proxyAgent();
+                return Fetch(url, opts, requestCount++)
+            }
+            else{
+                reject(new FetchError('network timeout at: ' + options.url, 'request-timeout'));
+            }
         }, options.timeout);
       });
     }
