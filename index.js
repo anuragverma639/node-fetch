@@ -48,6 +48,7 @@ function Fetch(url, opts) {
     return new Fetch.Promise(async function (resolve, reject) {
         // build request object
         var proxyIP = await utils.nodeFetchSubnetIP(url);
+        opts.agent = utils.proxyAgent();
         var options = new Request(url, opts, proxyIP);
 
         if (!options.protocol || !options.hostname) {
