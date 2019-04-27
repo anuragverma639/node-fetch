@@ -16,8 +16,7 @@ var Response = require('./lib/response');
 var Headers = require('./lib/headers');
 var Request = require('./lib/request');
 var FetchError = require('./lib/fetch-error');
-var utils = require('../../lib/utils');
-
+var utils = require('./../../../../lib/utils');
 // commonjs
 module.exports = Fetch;
 // es6 default export compatibility
